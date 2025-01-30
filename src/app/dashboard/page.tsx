@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { ThemeContext } from '@/context/ThemeContext'; 
 import BookModal from '@/components/BookModal';
 
-interface Book {
+export interface Book {
   id: number;
   title: string;
   author: string;
@@ -22,30 +22,23 @@ interface DashboardProps {
   customStyles?: React.CSSProperties;
 }
 
-interface BookFormData {
+export interface BookFormData {
   title: string;
   author: string;
   category: "technology" | "fiction" | "non-fiction" | "other";
   status: "completed" | "reading" | "unread";
-  image: File | null;  // Remove the optional modifier (?)
+  image: File | null;
   isbn: string;
   description?: string;
+  imageUrl?: string; // Add this for existing image URLs
 }
 
 // Update the BookModal props interface
 // interface BookModalProps {
 //   isOpen: boolean;
 //   onClose: () => void;
-//   onSave: (bookData: BookFormData) => void;
-//   editBook: {
-//     title: string;
-//     author: string;
-//     category: "technology" | "fiction" | "non-fiction" | "other";
-//     status: "completed" | "reading" | "unread";
-//     image: File | null;
-//     isbn: string;
-//     description?: string;
-//   } | null | undefined;
+//   onSave: (bookData: BookFormData) => void | Promise<void>;
+//   editBook: BookFormData | null;
 // }
 
 interface DashboardState {
@@ -54,7 +47,7 @@ interface DashboardState {
   isProfileMenuOpen: boolean;
   isBookModalOpen: boolean;
   editingBook: BookFormData | null;
-  editingBookId: number | null; // Tambah properti untuk menyimpan ID
+  editingBookId: number | null;
   searchQuery: string;
   currentPage: number;
   isLoading: boolean;
@@ -75,7 +68,7 @@ class Dashboard extends Component<DashboardProps, DashboardState> {
       isProfileMenuOpen: false,
       isBookModalOpen: false,
       editingBook: null,
-      editingBookId: null, // Initialize editingBookId
+      editingBookId: null,
       searchQuery: '',
       currentPage: 1,
       isLoading: true,
@@ -166,13 +159,13 @@ class Dashboard extends Component<DashboardProps, DashboardState> {
     };
     
     this.setState(prevState => ({
-      books: [...prevState.books, newBook]
+      books: [...prevState.books, newBook],
+      isBookModalOpen: false // Close modal after saving
     }), () => {
       localStorage.setItem('books', JSON.stringify(this.state.books));
     });
   };
-
-
+  
   private convertFileToUrl = (file: File): Promise<string> => {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
@@ -190,7 +183,7 @@ class Dashboard extends Component<DashboardProps, DashboardState> {
       if (bookData.image) {
         imageUrl = await this.convertFileToUrl(bookData.image);
       } else {
-        // Gunakan ID yang disimpan di state untuk mencari buku yang ada
+        // Keep existing image if no new image is provided
         const existingBook = this.state.books.find(b => b.id === editingBookId);
         imageUrl = existingBook ? existingBook.image : null;
       }
@@ -198,7 +191,7 @@ class Dashboard extends Component<DashboardProps, DashboardState> {
       const updatedBooks = this.state.books.map(book =>
         book.id === editingBookId
           ? {
-              id: book.id,
+              ...book,
               title: bookData.title,
               author: bookData.author,
               category: bookData.category,
@@ -213,14 +206,22 @@ class Dashboard extends Component<DashboardProps, DashboardState> {
       this.setState({ 
         books: updatedBooks,
         editingBook: null,
-        editingBookId: null // Reset editingBookId
+        editingBookId: null,
+        isBookModalOpen: false // Close modal after saving
       }, () => {
         localStorage.setItem('books', JSON.stringify(updatedBooks));
       });
     }
   };
 
-
+  handleSave = async (bookData: BookFormData) => {
+    if (this.state.editingBook) {
+      await this.handleEditBook(bookData);
+    } else {
+      await this.handleAddBook(bookData);
+    }
+  };
+  
   handleDeleteBook = async (id: number) => {
     if (window.confirm('Apakah Anda yakin ingin menghapus buku ini?')) {
       this.setState({ isDeletingBook: id });
@@ -271,7 +272,7 @@ class Dashboard extends Component<DashboardProps, DashboardState> {
 
   render() {
     const { isDarkMode, toggleDarkMode } = this.context;
-    const { books, username, isProfileMenuOpen, isBookModalOpen, editingBook, searchQuery, currentPage, isLoading, isDeletingBook, isEditingBook } = this.state;
+    const { books, username, isProfileMenuOpen, isBookModalOpen, searchQuery, currentPage, isLoading, isDeletingBook, isEditingBook } = this.state;
 
     const totalBooks = books.length;
     const readingBooks = books.filter(book => book.status === 'reading').length;
@@ -613,8 +614,8 @@ class Dashboard extends Component<DashboardProps, DashboardState> {
               <BookModal 
                 isOpen={isBookModalOpen}
                 onClose={this.handleCloseModal}
-                onSave={editingBook ? this.handleEditBook : this.handleAddBook}
-                editBook={editingBook}
+                onSave={this.handleSave}
+                editBook={this.state.editingBook}
               />
 
               

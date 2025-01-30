@@ -8,40 +8,54 @@ import { useTheme } from '@/context/ThemeContext'
 import Image from 'next/image'
 
 // Zod schema for book validation
-const bookSchema = z.object({
-  title: z.string().min(2, { message: "Judul minimal 2 karakter" }),
-  author: z.string().min(2, { message: "Nama penulis minimal 2 karakter" }),
-  isbn: z.string().min(10, { message: "ISBN minimal 10 karakter" })
-    .max(13, { message: "ISBN maksimal 13 karakter" })
-    .regex(/^[0-9-]+$/, { message: "ISBN hanya boleh berisi angka dan tanda hubung" }),
-  category: z.enum(['technology', 'fiction', 'non-fiction', 'other'], {
-    errorMap: () => ({ message: "Pilih kategori yang valid" })
-  }),
-  status: z.enum(['unread', 'reading', 'completed'], {
-    errorMap: () => ({ message: "Pilih status yang valid" })
-  }),
-  description: z.string().optional(),
-  image: z.custom<FileList>()
-    .optional()
-    .refine(
-      (files) => !files || (files instanceof FileList && files.length === 0) || (files instanceof FileList && files[0] instanceof File), 
-      "File tidak valid"
-    )
-    .transform(files => files && files.length > 0 ? files[0] : null)
-})
+const createBookSchema = () => {
+  const isClient = typeof window !== 'undefined'
+  
+  return z.object({
+    title: z.string().min(2, { message: "Judul minimal 2 karakter" }),
+    author: z.string().min(2, { message: "Nama penulis minimal 2 karakter" }),
+    isbn: z.string().min(10, { message: "ISBN minimal 10 karakter" })
+      .max(13, { message: "ISBN maksimal 13 karakter" })
+      .regex(/^[0-9-]+$/, { message: "ISBN hanya boleh berisi angka dan tanda hubung" }),
+    category: z.enum(['technology', 'fiction', 'non-fiction', 'other']),
+    status: z.enum(['unread', 'reading', 'completed']),
+    description: z.string().optional(),
+    image: isClient
+      ? z.instanceof(FileList)
+          .optional()
+          .transform(files => files && files.length > 0 ? files[0] : null)
+      : z.any().optional()
+  })
+}
 
-type BookFormData = z.infer<typeof bookSchema>
+type BookSchema = ReturnType<typeof createBookSchema>
+
+export type BookFormData = {
+  title: string;
+  author: string;
+  category: "technology" | "fiction" | "non-fiction" | "other";
+  status: "completed" | "reading" | "unread";
+  image: File | null;
+  isbn: string;
+  description?: string;
+  imageUrl?: string;
+}
 
 type BookModalProps = {
-  isOpen: boolean
-  onClose: () => void
-  onSave: (book: BookFormData & { imageUrl?: string }) => void
-  editBook?: (BookFormData & { imageUrl?: string }) | null
+  isOpen: boolean;
+  onClose: () => void;
+  onSave: (book: BookFormData & { imageUrl?: string }) => void;
+  editBook?: (BookFormData & { imageUrl?: string }) | null;
 }
 
 export default function BookModal({ isOpen, onClose, onSave, editBook }: BookModalProps) {
   const { isDarkMode } = useTheme()
   const [previewUrl, setPreviewUrl] = useState<string>('')
+  const [bookSchema, setBookSchema] = useState<BookSchema>(() => createBookSchema())
+  
+  useEffect(() => {
+    setBookSchema(createBookSchema())
+  }, [])
 
   const { 
     register, 
@@ -65,9 +79,12 @@ export default function BookModal({ isOpen, onClose, onSave, editBook }: BookMod
   // Watch for file changes to create preview
   const imageFile = watch('image');
 
+  // First, update the useEffect to handle FileList properly
   useEffect(() => {
-    if (imageFile) {
-      const url = URL.createObjectURL(imageFile);
+    const file = imageFile instanceof FileList ? imageFile[0] : imageFile;
+    
+    if (file instanceof File) {
+      const url = URL.createObjectURL(file);
       setPreviewUrl(url);
       return () => URL.revokeObjectURL(url);
     }
@@ -89,7 +106,6 @@ export default function BookModal({ isOpen, onClose, onSave, editBook }: BookMod
   }, [reset, setValue, editBook, isOpen])
 
   const onSubmit = async (data: BookFormData) => {
-    // Pass both the form data and the existing imageUrl if no new file is selected
     onSave({
       ...data,
       imageUrl: data.image ? await readFileAsDataURL(data.image) : editBook?.imageUrl

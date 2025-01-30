@@ -11,6 +11,8 @@ type Book = {
   author: string
   category: string
   status: string
+  image?: File | null
+  imageUrl?: string
 }
 
 export default function Catalog() {
@@ -298,20 +300,26 @@ export default function Catalog() {
       </div>
       {/* Book Modal */}
       <BookModal
-        isOpen={isBookModalOpen}
-        onClose={() => setIsBookModalOpen(false)}
-        onSave={(bookData) => {
-          const newBook = {
-            ...bookData,
-            id: books.length > 0 ? Math.max(...books.map(b => b.id)) + 1 : 1
-          }
-          const updatedBooks = [...books, newBook]
-          setBooks(updatedBooks)
-          localStorage.setItem('books', JSON.stringify(updatedBooks))
-          setIsBookModalOpen(false)
-        }}
-        editBook={null}
-      />
+      isOpen={isBookModalOpen}
+      onClose={() => setIsBookModalOpen(false)}
+      onSave={(bookData) => {
+        // Ensure the new book matches the Book type
+        const newBook: Book = {
+          id: books.length > 0 ? Math.max(...books.map(b => b.id)) + 1 : 1,
+          title: bookData.title,
+          author: bookData.author,
+          category: bookData.category,
+          status: bookData.status,
+          image: bookData.image || null,
+          imageUrl: bookData.imageUrl
+        }
+        const updatedBooks = [...books, newBook]
+        setBooks(updatedBooks)
+        localStorage.setItem('books', JSON.stringify(updatedBooks))
+        setIsBookModalOpen(false)
+      }}
+      editBook={null}
+    />
     </div>
   )
 }
