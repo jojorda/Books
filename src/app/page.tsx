@@ -16,10 +16,11 @@ export default function Home() {
         router.push('/login')
       }
     } catch (error) {
+      console.error('Error checking currentUser:', error)
       router.push('/login')
     } finally {
       setIsLoading(false)
-    }
+    }    
   }, [router])
 
   if (isLoading) {

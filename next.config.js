@@ -2,7 +2,7 @@
 const nextConfig = {
   images: {
     domains: ['your-domain.com'],
-    unoptimized: true, // add domains where your images are hosted
+    unoptimized: true,
   },
   compiler: {
     removeConsole: process.env.NODE_ENV === 'production',
@@ -14,29 +14,11 @@ const nextConfig = {
   poweredByHeader: false,
   reactStrictMode: true,
   output: 'standalone',
-  // Disable static optimization to reduce memory usage
   experimental: {
-    // Disable memory-intensive features
-    optimizeCss: false,
-    
-    // Enable parallel builds
-    workerThreads: true,
-    // Optimize page loading
-    optimizeCss: true,
-    // optimizeImages: false,
+    optimizeCss: false, // Matikan CSS optimization
+    workerThreads: false, // Matikan worker threads
   },
-  webpack: (config, { dev, isServer }) => {
-    // Optimize webpack configuration
-    config.cache = {
-      type: 'filesystem',
-      // Reduce cache size
-      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-      buildDependencies: {
-        config: [__filename],
-      },
-    }
-
-    // Add memory optimization for development
+  webpack: (config, { dev }) => {
     if (dev) {
       config.optimization = {
         ...config.optimization,

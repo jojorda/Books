@@ -21,7 +21,13 @@ const bookSchema = z.object({
     errorMap: () => ({ message: "Pilih status yang valid" })
   }),
   description: z.string().optional(),
-  image: z.instanceof(FileList).optional().transform(files => files?.[0] || null)
+  image: z.custom<FileList>()
+    .optional()
+    .refine(
+      (files) => !files || (files instanceof FileList && files.length === 0) || (files instanceof FileList && files[0] instanceof File), 
+      "File tidak valid"
+    )
+    .transform(files => files && files.length > 0 ? files[0] : null)
 })
 
 type BookFormData = z.infer<typeof bookSchema>
@@ -261,7 +267,7 @@ export default function BookModal({ isOpen, onClose, onSave, editBook }: BookMod
                   <Image
                     src={previewUrl} 
                     alt="Preview" 
-                    width={500} // adjust these values
+                    width={500}
                     height={300}
                     className="max-w-full h-auto max-h-48 rounded"
                   />
@@ -269,7 +275,7 @@ export default function BookModal({ isOpen, onClose, onSave, editBook }: BookMod
               )}
               {errors.image && (
                 <p className="text-red-500 text-sm mt-1">
-                  {errors.image.message}
+                  {errors.image.message as string}
                 </p>
               )}
             </div>

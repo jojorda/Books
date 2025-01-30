@@ -89,6 +89,7 @@ export default function Register() {
         // Redirect ke halaman login
         router.push('/login')
       } catch (error) {
+        console.error('Error checking currentUser:', error)
         setErrors({ ...errors, submit: 'Terjadi kesalahan saat mendaftar' })
       } finally {
         setIsLoading(false)

@@ -65,6 +65,7 @@ export default function Login() {
         setErrorMessage('Email atau password salah')
       }
     } catch (error) {
+      console.error('Error checking currentUser:', error)
       setErrorMessage('Terjadi kesalahan saat login')
     } finally {
       setIsLoading(false)
@@ -201,7 +202,7 @@ export default function Login() {
                 Forgot Password?
               </a>
               <p className={`text-sm sm:text-base ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
-                Don't have an account?{' '}
+                Don&apos;t have an account?{' '}
                 <motion.span 
                   whileHover={{ scale: 1.05 }}
                   onClick={() => router.push('/register')} 

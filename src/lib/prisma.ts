@@ -1,13 +1,17 @@
 import { PrismaClient } from '@prisma/client'
 
+// Deklarasi untuk memperluas tipe global
 declare global {
+  // eslint-disable-next-line no-var
   var prisma: PrismaClient | undefined
 }
 
-const prisma = global.prisma || new PrismaClient()
+// Inisialisasi PrismaClient
+const prisma = globalThis.prisma || new PrismaClient()
 
+// Simpan instance PrismaClient ke global dalam mode development
 if (process.env.NODE_ENV !== 'production') {
-  global.prisma = prisma
+  globalThis.prisma = prisma
 }
 
-export default prisma 
+export default prisma
