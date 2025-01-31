@@ -351,9 +351,9 @@ export default function BookDetail({ params }: { params: Promise<{ id: string }>
                       onClick={() => setIsEditingDescription(false)}
                       className={`px-4 py-2 rounded-lg ${
                         isDarkMode
-                          ? 'bg-gray-700 hover:bg-gray-600'
-                          : 'bg-gray-200 hover:bg-gray-300'
-                      } text-sm font-medium transition-colors`}
+                          ? 'bg-red-600 hover:bg-red-100 '
+                          : 'bg-red-600 hover:bg-red-100 '
+                      } text-sm font-medium`}
                     >
                       Batal
                     </button>

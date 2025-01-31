@@ -25,7 +25,12 @@ export default function Catalog() {
   const [currentPage, setCurrentPage] = useState(1)
   const [isLoading, setIsLoading] = useState(true)
   const [isBookModalOpen, setIsBookModalOpen] = useState(false)
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false)
   const booksPerPage = 5
+
+  const toggleSidebar = () => {
+    setIsSidebarOpen(!isSidebarOpen)
+  }
 
   useEffect(() => {
     const loadBooks = async () => {
@@ -94,6 +99,64 @@ export default function Catalog() {
         </div>
       </div>
 
+      {isSidebarOpen && (
+        <div 
+          className="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden"
+          onClick={() => setIsSidebarOpen(false)}
+        />
+      )}
+
+      <div 
+        className={`fixed left-0 top-0 bottom-0 w-64 bg-[#1e293b] shadow-lg z-50 transition-transform duration-300 ease-in-out md:translate-x-0 ${
+          isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
+        } ${
+          isSidebarOpen ? 'block' : 'hidden md:block'
+        }`}
+      >
+        <div className="p-4">
+          {/* BookShelf Title */}
+          <div className="flex items-center justify-between text-white mb-8">
+            <div className="flex items-center space-x-2">
+              <span className="text-xl">📚</span>
+              <span className="text-xl font-semibold">BookShelf</span>
+            </div>
+            {/* Close button for mobile */}
+            <button 
+              onClick={() => setIsSidebarOpen(false)}
+              className="md:hidden text-white text-xl"
+            >
+              ×
+            </button>
+          </div>
+
+          {/* Navigation Links */}
+          <div className="space-y-2">
+            <button
+              onClick={() => {
+                router.push('/dashboard')
+                setIsSidebarOpen(false)
+              }}
+              className="w-full flex items-center space-x-3 px-4 py-2.5 rounded-lg transition-colors text-gray-300 hover:bg-gray-700/50"
+            >
+              <span>📊</span>
+              <span>Dashboard</span>
+            </button>
+
+            <button
+              onClick={() => {
+                router.push('/catalog')
+                setIsSidebarOpen(false)
+              }}
+              className="w-full flex items-center space-x-3 px-4 py-2.5 rounded-lg transition-colors bg-gray-700 text-white"
+            >
+              <span>📚</span>
+              <span>Katalog Buku</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+
       {/* Main Content */}
       <div className="flex-1 md:ml-64">
         {/* Header */}
@@ -105,6 +168,13 @@ export default function Catalog() {
                   Katalog Buku
                 </h1>
               </div>
+              <div className="flex items-center ml-auto space-x-4">
+              <button 
+              onClick={toggleSidebar}
+              className={`text-xl ${isDarkMode ? 'text-white' : 'text-gray-800'}`}
+            >
+              ☰
+            </button>
               <button
                 onClick={toggleDarkMode}
                 className={`p-2 rounded-lg transition-colors ${
@@ -115,6 +185,7 @@ export default function Catalog() {
               >
                 {isDarkMode ? '🌙' : '☀️'}
               </button>
+              </div>
             </div>
           </div>
         </div>
