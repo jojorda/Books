@@ -47,7 +47,6 @@ interface DashboardState {
   books: Book[];
   username: string;
   isProfileMenuOpen: boolean;
-  isProfileMenuOpens: boolean;
   isBookModalOpen: boolean;
   editingBook: BookFormData | null;
   editingBookId: number | null;
@@ -70,7 +69,6 @@ class Dashboard extends Component<DashboardProps, DashboardState> {
       books: [],
       username: '',
       isProfileMenuOpen: false,
-      isProfileMenuOpens: false,
       isBookModalOpen: false,
       editingBook: null,
       editingBookId: null,
@@ -145,7 +143,6 @@ class Dashboard extends Component<DashboardProps, DashboardState> {
   handleClickOutside = (event: MouseEvent) => {
     if (!(event.target as HTMLElement).closest(".profile-menu")) {
       this.setState({ isProfileMenuOpen: false });
-      this.setState({ isProfileMenuOpens: false });
     }
   };
 
@@ -155,6 +152,7 @@ class Dashboard extends Component<DashboardProps, DashboardState> {
       window.location.href = '/login';
     } catch (error) {
       console.error('Error logging out:', error);
+      window.location.href = '/login';
     }
   };
 
@@ -290,7 +288,7 @@ class Dashboard extends Component<DashboardProps, DashboardState> {
 
   render() {
     const { isDarkMode, toggleDarkMode } = this.context;
-    const { books, username, isProfileMenuOpen, isProfileMenuOpens, isBookModalOpen, searchQuery, currentPage, isLoading, isDeletingBook, isEditingBook, isSidebarOpen } = this.state;
+    const { books, username, isProfileMenuOpen, isBookModalOpen, searchQuery, currentPage, isLoading, isDeletingBook, isEditingBook, isSidebarOpen } = this.state;
 
     const totalBooks = books.length;
     const readingBooks = books.filter(book => book.status === 'reading').length;
@@ -424,40 +422,13 @@ class Dashboard extends Component<DashboardProps, DashboardState> {
               ☰
             </button>
             
-            <Image onClick={() => this.setState({ isProfileMenuOpens: !isProfileMenuOpens })}
+            <Image onClick={() => this.setState({ isProfileMenuOpen: !isProfileMenuOpen })}
               src={PIO}
               alt="Login illustration"
               width={300}
               height={300}
               className="w-8 h-8 rounded-full border border-gray-400"
             />
-            {isProfileMenuOpens && (
-                    <div 
-                      className="absolute right-0 top-10 md:top-12 w-[230px] md:w-[350px] bg-white rounded-lg shadow-lg py-2 z-20 flex flex-col justify-between"
-                      onClick={(e) => e.stopPropagation()}
-                    >
-                      <div>
-                        <div className="px-4 py-3 border-b bg-blue-700 border-b-2">
-                          <div className="flex items-center space-x-2">
-                            <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white">
-                              {username ? username[0].toUpperCase() : 'U'}
-                            </div>
-                            <div>
-                              <p className="text-lg font-medium text-white">{username || 'User'}</p>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                      <div className='mt-auto border-t bg-blue-100 w-[90px] ml-auto mr-6 mt-9'>
-                        <button 
-                          onClick={this.handleLogout}
-                          className="w-full text-left px-4 py-3 text-sm text-blue-700 hover:bg-blue-200 flex items-center space-x-2 transition-colors"
-                        >
-                          <span>Sign Out</span>
-                        </button>
-                      </div>
-                    </div>
-                  )}
           </div>
           </div>
         </div>
