@@ -6,10 +6,8 @@ declare global {
   var prisma: PrismaClient | undefined
 }
 
-// Inisialisasi PrismaClient
 const prisma = globalThis.prisma || new PrismaClient()
 
-// Simpan instance PrismaClient ke global dalam mode development
 if (process.env.NODE_ENV !== 'production') {
   globalThis.prisma = prisma
 }

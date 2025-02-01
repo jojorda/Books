@@ -32,10 +32,9 @@ export interface BookFormData {
   image: File | null;
   isbn: string;
   description?: string;
-  imageUrl?: string; // Add this for existing image URLs
+  imageUrl?: string; 
 }
 
-// Update the BookModal props interface
 // interface BookModalProps {
 //   isOpen: boolean;
 //   onClose: () => void;
@@ -87,7 +86,6 @@ class Dashboard extends Component<DashboardProps, DashboardState> {
     }));
   };
 
-  // Add method to close sidebar when clicking overlay
   handleOverlayClick = () => {
     this.setState({ isSidebarOpen: false });
   };
@@ -176,7 +174,7 @@ class Dashboard extends Component<DashboardProps, DashboardState> {
     
     this.setState(prevState => ({
       books: [...prevState.books, newBook],
-      isBookModalOpen: false // Close modal after saving
+      isBookModalOpen: false 
     }), () => {
       localStorage.setItem('books', JSON.stringify(this.state.books));
     });
@@ -199,7 +197,6 @@ class Dashboard extends Component<DashboardProps, DashboardState> {
       if (bookData.image) {
         imageUrl = await this.convertFileToUrl(bookData.image);
       } else {
-        // Keep existing image if no new image is provided
         const existingBook = this.state.books.find(b => b.id === editingBookId);
         imageUrl = existingBook ? existingBook.image : null;
       }
@@ -223,7 +220,7 @@ class Dashboard extends Component<DashboardProps, DashboardState> {
         books: updatedBooks,
         editingBook: null,
         editingBookId: null,
-        isBookModalOpen: false // Close modal after saving
+        isBookModalOpen: false 
       }, () => {
         localStorage.setItem('books', JSON.stringify(updatedBooks));
       });
@@ -264,9 +261,9 @@ class Dashboard extends Component<DashboardProps, DashboardState> {
         author: book.author,
         category: book.category,
         status: book.status,
-        image: null, // Make sure this is explicitly null, not undefined
+        image: null, 
         isbn: book.isbn,
-        description: book.description || '' // Provide default empty string if undefined
+        description: book.description || '' 
       };
       this.setState({ 
         editingBook: bookFormData,
@@ -282,7 +279,7 @@ class Dashboard extends Component<DashboardProps, DashboardState> {
     this.setState({ 
       isBookModalOpen: false, 
       editingBook: null,
-      editingBookId: null // Reset editingBookId
+      editingBookId: null 
     });
   };
 
@@ -317,18 +314,16 @@ class Dashboard extends Component<DashboardProps, DashboardState> {
         {/* Sidebar */}
         <div className="hidden md:block fixed left-0 top-0 bottom-0 w-64 bg-[#1e293b] shadow-lg">
           <div className="p-4">
-            {/* BookShelf Title */}
             <div className="flex items-center space-x-2 text-white mb-8">
               <span className="text-xl">📚</span>
               <span className="text-xl font-semibold">BookShelf</span>
             </div>
 
-            {/* Navigation Links */}
             <div className="space-y-2">
               <Link href="./dashboard">
                 <button
                   className={`w-full flex items-center space-x-3 px-4 py-2.5 rounded-lg transition-colors ${
-                    true // dashboard is active
+                    true 
                       ? 'bg-gray-700 text-white'
                       : 'text-gray-300 hover:bg-gray-700/50'
                   }`}
@@ -351,7 +346,6 @@ class Dashboard extends Component<DashboardProps, DashboardState> {
         </div>
         
         <div className={`md:hidden fixed inset-0 z-50 ${isSidebarOpen ? '' : 'pointer-events-none'}`}>
-          {/* Overlay */}
           <div 
             className={`fixed inset-0 bg-black transition-opacity duration-300 ${
               isSidebarOpen ? 'opacity-50' : 'opacity-0'
@@ -359,12 +353,10 @@ class Dashboard extends Component<DashboardProps, DashboardState> {
             onClick={this.handleOverlayClick}
           />
           
-          {/* Sliding Sidebar */}
           <div className={`fixed top-0 bottom-0 left-0 w-64 bg-[#1e293b] shadow-lg transform transition-transform duration-300 ease-in-out ${
             isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
           }`}>
             <div className="p-4">
-              {/* BookShelf Title */}
               <div className="flex items-center justify-between text-white mb-8">
                 <div className="flex items-center space-x-2">
                   <span className="text-xl">📚</span>
@@ -378,7 +370,6 @@ class Dashboard extends Component<DashboardProps, DashboardState> {
                 </button>
               </div>
 
-              {/* Navigation Links */}
               <div className="space-y-2">
                 <Link href="./dashboard">
                   <button
@@ -401,7 +392,6 @@ class Dashboard extends Component<DashboardProps, DashboardState> {
             </div>
           </div>
         </div>
-        {/* Mobile Header with Menu Button */}
         <div className="md:hidden fixed top-0 left-0 right-0 z-20">
           <div className={`${isDarkMode ? 'bg-gray-800' : 'bg-white'} p-4 shadow-md flex justify-between items-center`}>
             <div className={`flex items-center space-x-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
@@ -433,9 +423,7 @@ class Dashboard extends Component<DashboardProps, DashboardState> {
           </div>
         </div>
 
-        {/* Main Content Area with padding for fixed sidebar */}
         <div className="flex-1 md:ml-64">
-          {/* Fixed Header */}
           <div className="fixed top-0 right-0 left-0 md:left-64 z-10">
             <div className={`${
               isDarkMode ? 'bg-gray-800' : 'bg-white'
@@ -446,7 +434,6 @@ class Dashboard extends Component<DashboardProps, DashboardState> {
                 }`}>Dashboard</h2>
               </div>
               
-              {/* Profile and Theme Toggle */}
               <div className="flex items-center space-x-1 md:space-x-4 relative">
                 <button
                   onClick={toggleDarkMode}
@@ -455,7 +442,6 @@ class Dashboard extends Component<DashboardProps, DashboardState> {
                   {isDarkMode ? '🌙' : '☀️'}
                 </button>
                 
-                {/* Profile Button */}
                 <div 
                   className="profile-menu relative"
                 >
@@ -504,9 +490,7 @@ class Dashboard extends Component<DashboardProps, DashboardState> {
             </div>
           </div>
 
-          {/* Content with padding for fixed header */}
           <div className="pt-24 md:pt-28 p-4 md:p-8  ">
-            {/* Search and Add Book Section */}
             <div className="mb-8 flex flex-col md:flex-row gap-4 md:items-center ">
               <div className="w-full md:w-80">
                 <input
@@ -528,7 +512,6 @@ class Dashboard extends Component<DashboardProps, DashboardState> {
               </button>
             </div>
 
-            {/* Stats Cards */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
               <div className="bg-blue-500 text-white p-4 md:p-5 rounded-xl">
                 <div className="flex items-center space-x-3">
@@ -561,7 +544,6 @@ class Dashboard extends Component<DashboardProps, DashboardState> {
               </div>
             </div>
 
-            {/* Books Table */}
             <div className={`${isDarkMode ? 'bg-gray-800' : 'bg-white'} rounded-xl shadow-lg overflow-hidden`}>
             <div className="overflow-x-auto">
               <table className="w-full">
@@ -698,7 +680,6 @@ class Dashboard extends Component<DashboardProps, DashboardState> {
               />
 
               
-              {/* Pagination */}
               <div className={`px-4 py-4 border-t ${isDarkMode ? 'border-gray-700 bg-gray-800' : 'border-gray-200 bg-white'} flex justify-between items-center`}>
                 <span className={`text-sm md:text-base ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
                   Menampilkan {indexOfFirstBook + 1} - {Math.min(indexOfLastBook, filteredBooks.length)} dari {filteredBooks.length} buku

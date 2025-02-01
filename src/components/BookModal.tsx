@@ -7,7 +7,6 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useTheme } from '@/context/ThemeContext'
 import Image from 'next/image'
 
-// Zod schema for book validation
 const createBookSchema = () => {
   const isClient = typeof window !== 'undefined'
   
@@ -76,10 +75,8 @@ export default function BookModal({ isOpen, onClose, onSave, editBook }: BookMod
     }
   })
 
-  // Watch for file changes to create preview
   const imageFile = watch('image');
 
-  // First, update the useEffect to handle FileList properly
   useEffect(() => {
     const file = imageFile instanceof FileList ? imageFile[0] : imageFile;
     

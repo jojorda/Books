@@ -28,33 +28,23 @@ export default function Login() {
     setErrorMessage('')
     
     try {
-      // Simulate network delay
       await new Promise(resolve => setTimeout(resolve, 1000))
       
-      // Ambil data users dari localStorage
       const users: UserData[] = JSON.parse(localStorage.getItem('users') || '[]')
-      
-      // Cari user berdasarkan email
-      const user = users.find(u => u.email === email)
+            const user = users.find(u => u.email === email)
       
       if (user) {
-        // Verifikasi password
         const isValidPassword = await bcrypt.compare(password, user.password)
         
         if (isValidPassword) {
-          // Buat objek user tanpa password untuk disimpan di localStorage
           const userWithoutPassword = {
             username: user.username,
             email: user.email
           }
           
-          // Simpan info login ke localStorage (tanpa password)
           localStorage.setItem('currentUser', JSON.stringify(userWithoutPassword))
-          
-          // Redirect ke halaman dashboard
           router.push('/dashboard')
           
-          // Reset form dan error
           setEmail('')
           setPassword('')
           setErrorMessage('')
@@ -85,7 +75,6 @@ export default function Login() {
         isDarkMode ? 'bg-gray-800' : 'bg-white'
       } p-6 sm:p-8 rounded-lg shadow-lg w-full max-w-[800px] flex flex-col md:flex-row transition-colors duration-300`}>
         
-        {/* Image Container - Left side on desktop, top on mobile */}
         <div className="w-full md:w-1/2 flex justify-center items-center order-1 md:order-none mb-6 md:mb-0">
           <motion.div 
             initial={{ opacity: 0, x: -20 }}
@@ -104,7 +93,6 @@ export default function Login() {
           </motion.div>
         </div>
 
-        {/* Form Container - Right side on desktop */}
         <div className="w-full md:w-1/2 order-2 md:order-none">
           <div className="flex justify-between items-center mb-6">
             <h1 className={`text-2xl sm:text-3xl font-bold text-center ${

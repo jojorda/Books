@@ -27,26 +27,22 @@ export default function Register() {
   const validateForm = () => {
     const newErrors: {[key: string]: string} = {}
     
-    // Validasi username
     if (!username.trim()) {
       newErrors.username = 'Username harus diisi'
     }
 
-    // Validasi email
     if (!email.trim()) {
       newErrors.email = 'Email harus diisi'
     } else if (!/\S+@\S+\.\S+/.test(email)) {
       newErrors.email = 'Format email tidak valid'
     }
 
-    // Validasi password
     if (!password) {
       newErrors.password = 'Password harus diisi'
     } else if (password.length < 6) {
       newErrors.password = 'Password minimal 6 karakter'
     }
 
-    // Validasi confirm password
     if (!confirmPassword) {
       newErrors.confirmPassword = 'Konfirmasi password harus diisi'
     } else if (confirmPassword !== password) {
@@ -63,30 +59,22 @@ export default function Register() {
     if (validateForm()) {
       setIsLoading(true)
       try {
-        // Simulate network delay
         await new Promise(resolve => setTimeout(resolve, 1000))
-        
-        // Hash password sebelum disimpan
         const salt = await bcrypt.genSalt(10)
         const hashedPassword = await bcrypt.hash(password, salt)
         
-        // Simpan data user ke localStorage dengan password yang sudah di-hash
         const userData: UserData = {
           username,
           email,
-          password: hashedPassword // Simpan password yang sudah di-hash
+          password: hashedPassword 
         }
         
-        // Ambil data users yang sudah ada (jika ada)
         const existingUsers = JSON.parse(localStorage.getItem('users') || '[]')
         
-        // Tambahkan user baru
         existingUsers.push(userData)
         
-        // Simpan kembali ke localStorage
         localStorage.setItem('users', JSON.stringify(existingUsers))
         
-        // Redirect ke halaman login
         router.push('/login')
       } catch (error) {
         console.error('Error checking currentUser:', error)
@@ -110,7 +98,6 @@ export default function Register() {
         isDarkMode ? 'bg-gray-800' : 'bg-white'
       } p-6 sm:p-8 rounded-lg shadow-lg w-full max-w-[800px] flex flex-col md:flex-row transition-colors duration-300`}>
         
-        {/* Image Container - Left side on desktop, top on mobile */}
         <div className="w-full md:w-1/2 flex justify-center items-center order-1 md:order-none mb-6 md:mb-0">
           <motion.div 
             initial={{ opacity: 0, x: -20 }}
@@ -129,7 +116,6 @@ export default function Register() {
           </motion.div>
         </div>
 
-        {/* Form Container - Right side on desktop */}
         <div className="w-full md:w-1/2 order-2 md:order-none">
           <div className="flex justify-between items-center mb-6">
             <h1 className={`text-2xl sm:text-3xl font-bold text-center ${

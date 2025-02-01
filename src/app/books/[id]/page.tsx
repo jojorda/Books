@@ -22,7 +22,6 @@ export default function BookDetail({ params }: { params: Promise<{ id: string }>
   const { isDarkMode, toggleDarkMode } = useTheme()
   const [book, setBook] = useState<Book | null>(null)
   const [isLoading, setIsLoading] = useState(true)
-  // const [isEditingImage, setIsEditingImage] = useState(false)
   const [isEditingDescription, setIsEditingDescription] = useState(false)
   const [description, setDescription] = useState('')
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -32,7 +31,6 @@ export default function BookDetail({ params }: { params: Promise<{ id: string }>
     const loadBook = async () => {
       setIsLoading(true)
       try {
-        // Simulate network delay
         await new Promise(resolve => setTimeout(resolve, 1000))
         const savedBooks = localStorage.getItem('books')
         if (savedBooks) {
@@ -56,13 +54,11 @@ export default function BookDetail({ params }: { params: Promise<{ id: string }>
   const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
     if (file && book) {
-      // Validate file type
       if (!file.type.startsWith('image/')) {
         alert('Please upload an image file')
         return
       }
 
-      // Validate file size (max 5MB)
       if (file.size > 5 * 1024 * 1024) {
         alert('Image size should be less than 5MB')
         return
@@ -80,7 +76,6 @@ export default function BookDetail({ params }: { params: Promise<{ id: string }>
           localStorage.setItem('books', JSON.stringify(updatedBooks))
           setBook(updatedBook)
         }
-        // setIsEditingImage(false)
       }
       reader.readAsDataURL(file)
     }
@@ -107,29 +102,24 @@ export default function BookDetail({ params }: { params: Promise<{ id: string }>
       <div className={`min-h-screen p-8 ${isDarkMode ? 'bg-gray-900' : 'bg-gray-50'}`}>
         <div className={`max-w-4xl mx-auto ${isDarkMode ? 'bg-gray-800' : 'bg-white'} rounded-xl shadow-lg p-8`}>
           <div className="animate-pulse space-y-6">
-            {/* Title skeleton */}
             <div className={`h-8 w-3/4 rounded ${isDarkMode ? 'bg-gray-700' : 'bg-gray-200'}`}></div>
             
-            {/* Author and ISBN skeleton */}
             <div className="space-y-2">
               <div className={`h-4 w-1/2 rounded ${isDarkMode ? 'bg-gray-700' : 'bg-gray-200'}`}></div>
               <div className={`h-4 w-1/3 rounded ${isDarkMode ? 'bg-gray-700' : 'bg-gray-200'}`}></div>
             </div>
             
-            {/* Category and Status skeleton */}
             <div className="flex space-x-4">
               <div className={`h-8 w-24 rounded-full ${isDarkMode ? 'bg-gray-700' : 'bg-gray-200'}`}></div>
               <div className={`h-8 w-24 rounded-full ${isDarkMode ? 'bg-gray-700' : 'bg-gray-200'}`}></div>
             </div>
             
-            {/* Description skeleton */}
             <div className="space-y-2">
               <div className={`h-4 w-full rounded ${isDarkMode ? 'bg-gray-700' : 'bg-gray-200'}`}></div>
               <div className={`h-4 w-5/6 rounded ${isDarkMode ? 'bg-gray-700' : 'bg-gray-200'}`}></div>
               <div className={`h-4 w-4/6 rounded ${isDarkMode ? 'bg-gray-700' : 'bg-gray-200'}`}></div>
             </div>
             
-            {/* Buttons skeleton */}
             <div className="flex space-x-4 pt-4">
               <div className={`h-10 w-24 rounded ${isDarkMode ? 'bg-gray-700' : 'bg-gray-200'}`}></div>
               <div className={`h-10 w-24 rounded ${isDarkMode ? 'bg-gray-700' : 'bg-gray-200'}`}></div>
@@ -189,17 +179,18 @@ export default function BookDetail({ params }: { params: Promise<{ id: string }>
       <div className="container mx-auto px-4 pt-24 pb-8">
         <div className={`p-8 rounded-xl shadow-md ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {/* Left Column - Image */}
+            
             <div>
               <div className={`relative aspect-[3/4] w-full rounded-lg overflow-hidden ${
                 isDarkMode ? 'bg-gray-700' : 'bg-gray-100'
               }`}>
                 {book.imageUrl ? (
                   book.imageUrl.startsWith('data:') ? (
-                    // For base64 images
                     <Image
                       src={book.imageUrl}
                       alt={book.title}
+                      width={300} 
+                      height={400}
                       className="absolute inset-0 w-full h-full object-cover"
                     />
                   ) : (
@@ -241,9 +232,7 @@ export default function BookDetail({ params }: { params: Promise<{ id: string }>
               </div>
             </div>
 
-            {/* Right Column - Details */}
             <div>
-              {/* Title and Author */}
               <div className="mb-8">
                 <h1 className={`text-2xl md:text-3xl font-bold ${
                   isDarkMode ? 'text-white' : 'text-gray-900'
@@ -262,7 +251,6 @@ export default function BookDetail({ params }: { params: Promise<{ id: string }>
                 </p>
               </div>
 
-              {/* Book Details */}
               <div>
                 <h2 className={`text-xl font-semibold mb-4 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
                   Informasi Buku
@@ -312,7 +300,6 @@ export default function BookDetail({ params }: { params: Promise<{ id: string }>
                 </div>
               </div>
 
-              {/* Description */}
               <div className="mt-8">
                 <div className="flex items-center justify-between mb-4">
                   <h2 className={`text-xl font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>

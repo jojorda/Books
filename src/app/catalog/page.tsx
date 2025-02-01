@@ -36,7 +36,6 @@ export default function Catalog() {
     const loadBooks = async () => {
       setIsLoading(true)
       try {
-        // Simulate network delay
         await new Promise(resolve => setTimeout(resolve, 1000))
         const savedBooks = localStorage.getItem('books')
         if (savedBooks) {
@@ -51,7 +50,6 @@ export default function Catalog() {
     loadBooks()
   }, [])
 
-  // Filter and search books
   const filteredBooks = books.filter(book => {
     const matchesSearch = book.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
                          book.author.toLowerCase().includes(searchQuery.toLowerCase())
@@ -60,7 +58,6 @@ export default function Catalog() {
     return matchesSearch && matchesCategory && matchesStatus
   })
 
-  // Pagination
   const totalPages = Math.ceil(filteredBooks.length / booksPerPage)
   const paginatedBooks = filteredBooks.slice(
     (currentPage - 1) * booksPerPage,
@@ -72,13 +69,11 @@ export default function Catalog() {
       {/* Sidebar */}
       <div className="hidden md:block fixed left-0 top-0 bottom-0 w-64 bg-[#1e293b] shadow-lg">
         <div className="p-4">
-          {/* BookShelf Title */}
           <div className="flex items-center space-x-2 text-white mb-8">
             <span className="text-xl">📚</span>
             <span className="text-xl font-semibold">BookShelf</span>
           </div>
 
-          {/* Navigation Links */}
           <div className="space-y-2">
             <button
               onClick={() => router.push('/dashboard')}
@@ -114,13 +109,11 @@ export default function Catalog() {
         }`}
       >
         <div className="p-4">
-          {/* BookShelf Title */}
           <div className="flex items-center justify-between text-white mb-8">
             <div className="flex items-center space-x-2">
               <span className="text-xl">📚</span>
               <span className="text-xl font-semibold">BookShelf</span>
             </div>
-            {/* Close button for mobile */}
             <button 
               onClick={() => setIsSidebarOpen(false)}
               className="md:hidden text-white text-xl"
@@ -129,7 +122,6 @@ export default function Catalog() {
             </button>
           </div>
 
-          {/* Navigation Links */}
           <div className="space-y-2">
             <button
               onClick={() => {
@@ -159,7 +151,6 @@ export default function Catalog() {
 
       {/* Main Content */}
       <div className="flex-1 md:ml-64">
-        {/* Header */}
         <div className={`fixed top-0 right-0 left-0 md:left-64 z-10 ${isDarkMode ? 'bg-gray-800' : 'bg-white'} shadow-md`}>
           <div className="container mx-auto px-4 py-4">
             <div className="flex items-center justify-between">
@@ -190,9 +181,7 @@ export default function Catalog() {
           </div>
         </div>
 
-        {/* Main Content Area */}
         <div className="container mx-auto px-4 pt-24 pb-8">
-          {/* Search and Filters */}
           <div className={`p-4 mb-6 rounded-xl ${isDarkMode ? 'bg-gray-800' : 'bg-white'} shadow-md`}>
             <div className="grid grid-cols-1 md:grid-cols-5 gap-4 items-center">
               <div>
@@ -256,10 +245,8 @@ export default function Catalog() {
             </div>
           </div>
 
-          {/* Books Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {isLoading ? (
-              // Loading skeleton
               [...Array(6)].map((_, index) => (
                 <div
                   key={index}
@@ -327,7 +314,6 @@ export default function Catalog() {
             )}
           </div>
 
-          {/* Pagination */}
           {!isLoading && totalPages > 1 && (
             <div className="flex justify-center mt-8 space-x-2">
               <button
@@ -369,12 +355,10 @@ export default function Catalog() {
           )}
         </div>
       </div>
-      {/* Book Modal */}
       <BookModal
       isOpen={isBookModalOpen}
       onClose={() => setIsBookModalOpen(false)}
       onSave={(bookData) => {
-        // Ensure the new book matches the Book type
         const newBook: Book = {
           id: books.length > 0 ? Math.max(...books.map(b => b.id)) + 1 : 1,
           title: bookData.title,
