@@ -392,8 +392,8 @@ class Dashboard extends Component<DashboardProps, DashboardState> {
             </div>
           </div>
         </div>
-        <div className="md:hidden fixed top-0 left-0 right-0 z-20">
-          <div className={`${isDarkMode ? 'bg-gray-800' : 'bg-white'} p-4 shadow-md flex justify-between items-center`}>
+        <div className="md:hidden fixed top-0 left-0 right-0 z-20 ">
+          <div className={`${isDarkMode ? 'bg-gray-800' : 'bg-white'} p-4 shadow-md flex justify-between items-center h-12`}>
             <div className={`flex items-center space-x-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
               <span>📚</span>
               <span className="font-medium">BookShelf</span>

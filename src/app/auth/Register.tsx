@@ -6,84 +6,55 @@ import { useTheme } from '@/context/ThemeContext'
 import Image from 'next/image'
 import { motion } from 'framer-motion'
 import PIO from '../../styles/OIP.png'
-import bcrypt from 'bcryptjs'
-
-interface UserData {
-  username: string;
-  email: string;
-  password: string;
-}
 
 export default function Register() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [username, setUsername] = useState('')
-  const [errors, setErrors] = useState<{[key: string]: string}>({})
+  const [errorMessage, setErrorMessage] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const router = useRouter()
   const { isDarkMode, toggleDarkMode } = useTheme()
 
-  const validateForm = () => {
-    const newErrors: {[key: string]: string} = {}
-    
-    if (!username.trim()) {
-      newErrors.username = 'Username harus diisi'
-    }
-
-    if (!email.trim()) {
-      newErrors.email = 'Email harus diisi'
-    } else if (!/\S+@\S+\.\S+/.test(email)) {
-      newErrors.email = 'Format email tidak valid'
-    }
-
-    if (!password) {
-      newErrors.password = 'Password harus diisi'
-    } else if (password.length < 6) {
-      newErrors.password = 'Password minimal 6 karakter'
-    }
-
-    if (!confirmPassword) {
-      newErrors.confirmPassword = 'Konfirmasi password harus diisi'
-    } else if (confirmPassword !== password) {
-      newErrors.confirmPassword = 'Password tidak cocok'
-    }
-
-    setErrors(newErrors)
-    return Object.keys(newErrors).length === 0
-  }
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    
-    if (validateForm()) {
-      setIsLoading(true)
-      try {
-        await new Promise(resolve => setTimeout(resolve, 1000))
-        const salt = await bcrypt.genSalt(10)
-        const hashedPassword = await bcrypt.hash(password, salt)
-        
-        const userData: UserData = {
-          username,
-          email,
-          password: hashedPassword 
-        }
-        
-        const existingUsers = JSON.parse(localStorage.getItem('users') || '[]')
-        
-        existingUsers.push(userData)
-        
-        localStorage.setItem('users', JSON.stringify(existingUsers))
-        
-        router.push('/login')
-      } catch (error) {
-        console.error('Error checking currentUser:', error)
-        setErrors({ ...errors, submit: 'Terjadi kesalahan saat mendaftar' })
-      } finally {
-        setIsLoading(false)
-      }
+    setIsLoading(true)
+    setErrorMessage('')
+
+    if (password !== confirmPassword) {
+      setErrorMessage('Passwords do not match')
+      setIsLoading(false)
+      return
     }
-  }
+
+    try {
+      const response = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email,
+          password,
+          username,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Registration failed');
+      }
+
+      router.push('/login')
+    } catch (error) {
+      console.error('Registration error:', error);
+      setErrorMessage(error instanceof Error ? error.message : 'An error occurred during registration');
+    } finally {
+      setIsLoading(false)
+    }
+  };
 
   return (
     <motion.div 
@@ -142,20 +113,10 @@ export default function Register() {
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 ${
-                  errors.username ? 'border-red-500' : 
                   isDarkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-gray-900'
                 } transition-colors text-sm sm:text-base`}
                 placeholder="Enter your username"
               />
-              {errors.username && (
-                <motion.p 
-                  initial={{ opacity: 0, y: -10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="text-red-500 text-sm sm:text-sm mt-1"
-                >
-                  {errors.username}
-                </motion.p>
-              )}
             </div>
 
             <div>
@@ -170,20 +131,10 @@ export default function Register() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 ${
-                  errors.email ? 'border-red-500' : 
                   isDarkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-gray-900'
                 } transition-colors text-sm sm:text-base`}
                 placeholder="example@gmail.com"
               />
-              {errors.email && (
-                <motion.p 
-                  initial={{ opacity: 0, y: -10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="text-red-500 text-sm sm:text-sm mt-1"
-                >
-                  {errors.email}
-                </motion.p>
-              )}
             </div>
             
             <div>
@@ -198,20 +149,10 @@ export default function Register() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 className={`w-full px-3 py-2 border rounded-md text-black focus:outline-none focus:ring-2 focus:ring-blue-400 ${
-                  errors.password ? 'border-red-500 text-black' : 
                   isDarkMode ? 'bg-gray-700 text-white' : 'bg-white text-gray-900'
                 } transition-colors text-sm sm:text-base`}
                 placeholder="Enter your password"
               />
-              {errors.password && (
-                <motion.p 
-                  initial={{ opacity: 0, y: -10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="text-red-500 text-xs sm:text-sm mt-1"
-                >
-                  {errors.password}
-                </motion.p>
-              )}
             </div>
 
             <div>
@@ -226,20 +167,10 @@ export default function Register() {
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 className={`w-full px-3 py-2 border rounded-md text-black focus:outline-none focus:ring-2 focus:ring-blue-400 ${
-                  errors.confirmPassword ? 'border-red-500' : 
                   isDarkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white  text-gray-900'
                 } transition-colors text-sm sm:text-base`}
                 placeholder="Confirm your password"
               />
-              {errors.confirmPassword && (
-                <motion.p 
-                  initial={{ opacity: 0, y: -10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="text-red-500 text-xs sm:text-sm mt-1"
-                >
-                  {errors.confirmPassword}
-                </motion.p>
-              )}
             </div>
 
             <motion.button
@@ -269,6 +200,15 @@ export default function Register() {
                 'Daftar'
               )}
             </motion.button>
+            {errorMessage && (
+              <motion.p 
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="text-red-500 text-xs sm:text-sm mt-1"
+              >
+                {errorMessage}
+              </motion.p>
+            )}
           </form>
 
           <div className="mt-4 text-center">

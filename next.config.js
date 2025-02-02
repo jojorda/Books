@@ -7,29 +7,47 @@ const nextConfig = {
   compiler: {
     removeConsole: process.env.NODE_ENV === 'production',
   },
-  i18n: {
-    locales: ['en'],
-    defaultLocale: 'en',
-  },
   poweredByHeader: false,
   reactStrictMode: true,
   output: 'standalone',
-  experimental: {
-    optimizeCss: false, // Matikan CSS optimization
-    workerThreads: false, // Matikan worker threads
-  },
-  webpack: (config, { dev }) => {
-    if (dev) {
-      config.optimization = {
-        ...config.optimization,
-        moduleIds: 'named',
-        chunkIds: 'named',
-        minimize: false,
-      }
+  serverExternalPackages: ['sqlite3'],
+  webpack: (config, { isServer }) => {
+    if (!isServer) {
+      // Don't bundle sqlite3 on the client side
+      config.resolve.fallback = {
+        ...config.resolve.fallback,
+        fs: false,
+        path: false,
+        crypto: false,
+      };
     }
 
-    return config
-  },
+    // Optimize build performance
+    config.cache = true;
+    
+    if (process.env.NODE_ENV === 'production') {
+      // Production optimizations
+      config.optimization = {
+        ...config.optimization,
+        moduleIds: 'deterministic',
+        chunkIds: 'deterministic',
+        splitChunks: {
+          chunks: 'all',
+          minSize: 20000,
+          maxSize: 244000,
+          cacheGroups: {
+            vendor: {
+              test: /[\\/]node_modules[\\/]/,
+              name: 'vendors',
+              chunks: 'all',
+            },
+          },
+        },
+      };
+    }
+
+    return config;
+  }
 }
 
 module.exports = nextConfig
